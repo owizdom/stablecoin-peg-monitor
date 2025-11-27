@@ -30,6 +30,9 @@ ENV/
 .env
 .env.local
 
+# Streamlit secrets (contains actual credentials)
+.streamlit/secrets.toml
+
 # IDE
 .vscode/
 .idea/

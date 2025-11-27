@@ -38,6 +38,7 @@ TOKEN_SYMBOLS = ["USDC", "USDT"]
 def get_web3_connection() -> Web3:
     """
     Initialize Web3 connection using Alchemy RPC URL from environment variables.
+    Supports both Streamlit Cloud secrets and local .env files.
     
     Returns:
         Web3 instance connected to Ethereum mainnet
@@ -46,9 +47,21 @@ def get_web3_connection() -> Web3:
         ValueError: If ALCHEMY_RPC_URL is not set
         ConnectionError: If connection to RPC endpoint fails
     """
-    rpc_url = os.getenv("ALCHEMY_RPC_URL")
+    # Try to get from Streamlit secrets if available (for Streamlit Cloud)
+    rpc_url = None
+    try:
+        import streamlit as st
+        if hasattr(st, 'secrets') and 'ALCHEMY_RPC_URL' in st.secrets:
+            rpc_url = st.secrets['ALCHEMY_RPC_URL']
+    except:
+        pass
+    
+    # Fall back to environment variable (for local development)
     if not rpc_url:
-        raise ValueError("ALCHEMY_RPC_URL not set in environment variables")
+        rpc_url = os.getenv("ALCHEMY_RPC_URL")
+    
+    if not rpc_url:
+        raise ValueError("ALCHEMY_RPC_URL not set in environment variables or Streamlit secrets")
     
     try:
         logger.info(f"Connecting to Alchemy RPC endpoint...")

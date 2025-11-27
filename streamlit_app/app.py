@@ -83,21 +83,36 @@ if 'snowflake_conn' not in st.session_state:
 @st.cache_resource
 def get_snowflake_connection():
     """Create and cache Snowflake connection."""
+    # Support both Streamlit Cloud secrets and local .env files
+    def get_secret(key):
+        # Try Streamlit secrets first (for Streamlit Cloud)
+        try:
+            if hasattr(st, 'secrets') and key in st.secrets:
+                return st.secrets[key]
+        except:
+            pass
+        # Fall back to environment variables (for local development)
+        return os.getenv(key)
+    
     # Check for required environment variables
     required_vars = {
-        "SNOWFLAKE_USER": os.getenv("SNOWFLAKE_USER"),
-        "SNOWFLAKE_PASSWORD": os.getenv("SNOWFLAKE_PASSWORD"),
-        "SNOWFLAKE_ACCOUNT": os.getenv("SNOWFLAKE_ACCOUNT"),
-        "SNOWFLAKE_WAREHOUSE": os.getenv("SNOWFLAKE_WAREHOUSE"),
-        "SNOWFLAKE_DATABASE": os.getenv("SNOWFLAKE_DATABASE"),
-        "SNOWFLAKE_SCHEMA": os.getenv("SNOWFLAKE_SCHEMA"),
-        "SNOWFLAKE_ROLE": os.getenv("SNOWFLAKE_ROLE")
+        "SNOWFLAKE_USER": get_secret("SNOWFLAKE_USER"),
+        "SNOWFLAKE_PASSWORD": get_secret("SNOWFLAKE_PASSWORD"),
+        "SNOWFLAKE_ACCOUNT": get_secret("SNOWFLAKE_ACCOUNT"),
+        "SNOWFLAKE_WAREHOUSE": get_secret("SNOWFLAKE_WAREHOUSE"),
+        "SNOWFLAKE_DATABASE": get_secret("SNOWFLAKE_DATABASE"),
+        "SNOWFLAKE_SCHEMA": get_secret("SNOWFLAKE_SCHEMA"),
+        "SNOWFLAKE_ROLE": get_secret("SNOWFLAKE_ROLE")
     }
     
     missing_vars = [var for var, value in required_vars.items() if value is None]
     if missing_vars:
         st.error(f"Missing required environment variables: {', '.join(missing_vars)}")
-        st.info("Please create a `.env` file in the project root with your Snowflake credentials.")
+        st.info("""
+        **For Streamlit Cloud**: Go to Settings → Secrets and add your credentials.
+        
+        **For Local Development**: Create a `.env` file in the project root with your Snowflake credentials.
+        """)
         return None
     
     try:
