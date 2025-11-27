@@ -1,0 +1,32 @@
+name: 'stablecoin_peg_monitor'
+version: '1.0.0'
+config-version: 2
+
+profile: 'stablecoin_peg_monitor'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  snowflake_database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+  snowflake_schema: "{{ env_var('SNOWFLAKE_SCHEMA') }}"
+
+models:
+  stablecoin_peg_monitor:
+    +materialized: view
+    
+    # Peg Health Model
+    stablecoin_peg_health:
+      +materialized: view
+      +description: "Peg health metrics calculated from Chainlink prices with deviation from $1.00"
+    
+    # Peg Z-Score Model
+    stablecoin_peg_zscore:
+      +materialized: table
+      +description: "24h rolling statistics and z-scores for peg deviation analysis"
+

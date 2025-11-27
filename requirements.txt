@@ -1,0 +1,14 @@
+dagster
+dagster-webserver
+dbt-core
+dbt-postgres
+streamlit
+requests
+python-dotenv
+pandas
+numpy
+web3
+snowflake-connector-python
+snowflake-sqlalchemy
+plotly
+

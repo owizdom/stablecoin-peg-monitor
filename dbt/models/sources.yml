@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: snowflake_raw
+    description: Raw data tables from Snowflake
+    database: "{{ var('snowflake_database') }}"
+    schema: "{{ var('snowflake_schema') }}"
+    
+    tables:
+      - name: CHAINLINK_PRICES
+        description: Chainlink price feed data for stablecoins
+
